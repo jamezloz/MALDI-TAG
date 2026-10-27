@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>MALDI-TAG</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+:root {
+  --bg: #f4f6f9;
+  --card: #ffffff;
+  --ink: #16202b;
+  --muted: #5d6b7a;
+  --line: #d8dfe7;
+  --accent: #1e5a8c;
+  --accent-2: #4a90c4;
+  --accent-soft: #e6f0f8;
+  --slide: #e9edf1;
+  --slide-edge: #c4ccd5;
+  --well: #ffffff;
+  --well-edge: #b5bec8;
+  --ok: #1f8a55;
+  --ok-soft: #e3f4ea;
+  --warn: #b7791f;
+  --warn-soft: #fbf1df;
+  --bad: #c0392b;
+  --bad-soft: #fbe7e4;
+  --input: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e151d;
+    --card: #151f2a;
+    --ink: #e8eef4;
+    --muted: #93a3b4;
+    --line: #2a3644;
+    --accent: #4a90c4;
+    --accent-2: #7cb4dc;
+    --accent-soft: #18324a;
+    --slide: #1c2733;
+    --slide-edge: #334252;
+    --well: #0f1822;
+    --well-edge: #405063;
+    --ok: #4cc287;
+    --ok-soft: #133426;
+    --warn: #e0a547;
+    --warn-soft: #3a2c12;
+    --bad: #ef6f5e;
+    --bad-soft: #3d1a16;
+    --input: #0f1822;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e151d; --card: #151f2a; --ink: #e8eef4; --muted: #93a3b4; --line: #2a3644;
+  --accent: #4a90c4; --accent-2: #7cb4dc; --accent-soft: #18324a; --slide: #1c2733;
+  --slide-edge: #334252; --well: #0f1822; --well-edge: #405063; --ok: #4cc287; --ok-soft: #133426;
+  --warn: #e0a547; --warn-soft: #3a2c12; --bad: #ef6f5e; --bad-soft: #3d1a16; --input: #0f1822;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font: 15px/1.5 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+.wrap { max-width: 1120px; margin: 0 auto; padding: 28px 16px 64px; }
+header h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.01em; }
+header p { margin: 0; color: var(--muted); max-width: 760px; }
+.steps { display: grid; gap: 22px; margin-top: 26px; }
+.steps > * { min-width: 0; }
+.card {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 20px;
+}
+.card h2 { display: flex; align-items: center; gap: 10px; font-size: 17px; margin: 0 0 4px; }
+.num {
+  display: inline-grid; place-items: center;
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--accent); color: #fff; font-size: 13px; font-weight: 700; flex: none;
+}
+.hint { color: var(--muted); margin: 0 0 16px; font-size: 14px; }
+.mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+button {
+  font: inherit; font-size: 14px; font-weight: 600;
+  border-radius: 9px; border: 1px solid var(--line);
+  background: var(--card); color: var(--ink);
+  padding: 8px 14px; cursor: pointer;
+}
+button:hover { border-color: var(--accent-2); }
+button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+button.primary:hover { filter: brightness(1.08); }
+button:disabled { opacity: .45; cursor: not-allowed; filter: none; }
+button.link { border: 0; background: none; color: var(--accent-2); padding: 4px 6px; }
+
+/* ---------- placa ---------- */
+.plates { display: flex; flex-wrap: wrap; gap: 22px; align-items: flex-start; }
+.plate-box { flex: 1 1 520px; max-width: 600px; min-width: 0; }
+.plate-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 8px; }
+.plate-head strong { font-size: 14px; }
+.slide-scroll { overflow-x: auto; padding: 6px 6px 8px; }
+/* La placa se dibuja igual que la física (metálica) en tema claro y oscuro. */
+.slide {
+  --s-ink: #6c727a;
+  --s-well: #a6abb1;
+  --s-pill: rgba(255,255,255,.55);
+  --s-text: #1b2228;
+  --s-ok: #1f8a55; --s-ok-soft: #d9f0e3;
+  --s-warn: #b7791f; --s-warn-soft: #f8ead0;
+  --s-bad: #c0392b; --s-bad-soft: #f8dcd8;
+  position: relative;
+  background: linear-gradient(165deg, #f4f5f6 0%, #dfe2e5 38%, #eef0f1 62%, #d3d6da 100%);
+  border: 1px solid #a3a9af;
+  border-radius: 7px;
+  box-shadow: 0 0 0 5px #17191c, 0 6px 18px rgba(0,0,0,.25);
+  padding: 26px 18px 14px;
+  min-width: 500px;
+  color: var(--s-text);
+}
+.corner { position: absolute; top: 9px; font-size: 11px; color: var(--s-ink); opacity: .7; line-height: 1; }
+.corner.l { left: 12px; } .corner.r { right: 12px; }
+.colfoot, .row { display: grid; grid-template-columns: 22px repeat(4, minmax(0, 1fr)); gap: 8px; align-items: center; }
+.colfoot { margin-top: 8px; font-size: 13px; color: var(--s-ink); text-align: center; }
+.quad { display: grid; gap: 8px; }
+.quad + .quad { margin-top: 18px; }
+.rowlab { font-size: 14px; color: var(--s-ink); text-align: center; }
+.well {
+  display: flex; align-items: center; gap: 6px;
+  background: var(--s-pill);
+  border: 1.5px solid transparent;
+  border-radius: 999px;
+  padding: 3px 4px 3px 3px;
+  min-width: 0;
+  transition: border-color .15s, background .15s;
+}
+.well:hover { border-color: rgba(0,0,0,.12); }
+.dot {
+  flex: none; width: 28px; height: 28px; border-radius: 50%;
+  display: grid; place-items: center;
+  font-size: 9.5px; font-weight: 700; color: rgba(255,255,255,.92);
+  background: radial-gradient(circle at 35% 30%, #c3c7cc, var(--s-well) 60%, #959a9f);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,.25);
+}
+.well input {
+  flex: 1; min-width: 0; width: 100%;
+  border: 0; outline: 0; background: transparent; color: var(--s-text);
+  font: 600 13px/1.2 "JetBrains Mono", ui-monospace, monospace;
+  padding: 4px 4px;
+}
+.well input::placeholder { color: var(--s-ink); opacity: .5; font-weight: 400; }
+.well:focus-within { background: #fff; border-color: #4a90c4; box-shadow: 0 0 0 3px rgba(74,144,196,.25); }
+.well.st-ok { border-color: var(--s-ok); background: var(--s-ok-soft); }
+.well.st-ok .dot { background: var(--s-ok); }
+.well.st-partial { border-color: var(--s-warn); background: var(--s-warn-soft); }
+.well.st-partial .dot { background: var(--s-warn); }
+.well.st-noname { border-color: var(--s-bad); background: var(--s-bad-soft); }
+.well.st-noname .dot { background: var(--s-bad); }
+.well.st-nofiles { border-color: #8a9097; border-style: dashed; }
+.well.st-dup { border-color: var(--s-bad); }
+.well.has-bad .dot { box-shadow: 0 0 0 2px var(--s-bad); }
+
+/* Etiqueta inferior de la placa: código 2D + número de placa */
+.slide-label {
+  margin: 16px -6px 0; background: #fff; border: 1px solid #c9cdd2; border-radius: 3px;
+  display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 10px 8px;
+}
+.slide-label svg { width: 64px; height: 64px; display: block; }
+.slide-label label { font-size: 11px; color: var(--s-ink); font-weight: 600; letter-spacing: .02em; }
+.slide-label input {
+  font: 600 15px "JetBrains Mono", ui-monospace, monospace; color: #111;
+  text-align: center; background: transparent;
+  border: 0; border-bottom: 1.5px dashed #9aa0a6; padding: 3px 6px; width: 230px; max-width: 100%;
+}
+.slide-label input::placeholder { color: #9aa0a6; }
+.slide-label input:focus { outline: 0; border-bottom-color: #4a90c4; }
+.plate-check { margin-top: 8px; font-size: 13px; min-height: 20px; }
+.ok-t { color: var(--ok); } .warn-t { color: var(--warn); } .bad-t { color: var(--bad); }
+
+.legend { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 14px; font-size: 13px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 13px; height: 13px; border-radius: 50%; display: inline-block; border: 1.5px solid; }
+
+/* ---------- carga ---------- */
+.drop {
+  border: 2px dashed var(--line); border-radius: 12px;
+  padding: 26px 16px; text-align: center; color: var(--muted);
+  transition: border-color .15s, background .15s;
+}
+.drop.over { border-color: var(--accent-2); background: var(--accent-soft); color: var(--ink); }
+.drop strong { color: var(--ink); display: block; font-size: 15px; margin-bottom: 4px; }
+.drop .btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-top: 12px; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-top: 16px; }
+.stat { border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; }
+.stat b { display: block; font-size: 22px; line-height: 1.2; }
+.stat small { color: var(--muted); font-size: 12px; }
+.notes { margin: 14px 0 0; padding: 0; list-style: none; display: grid; gap: 8px; font-size: 14px; }
+.notes li { padding: 9px 12px; border-radius: 9px; border: 1px solid var(--line); display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center; }
+.notes li.w { border-color: var(--warn); background: var(--warn-soft); }
+.notes li.e { border-color: var(--bad); background: var(--bad-soft); }
+
+/* ---------- descarga ---------- */
+.opt { display: flex; gap: 10px; align-items: flex-start; padding: 10px 0; }
+.opt input { margin-top: 4px; width: 16px; height: 16px; accent-color: var(--accent); flex: none; }
+.opt small { display: block; color: var(--muted); font-size: 13px; }
+.tag {
+  display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .02em;
+  padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-2);
+  margin-left: 6px; vertical-align: 1px;
+}
+.preview { margin-top: 12px; max-height: 260px; overflow: auto; border: 1px solid var(--line); border-radius: 10px; }
+.preview table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.preview th, .preview td { text-align: left; padding: 6px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+.preview th { position: sticky; top: 0; background: var(--card); font-size: 12px; color: var(--muted); }
+.preview td.orig { color: var(--muted); max-width: 380px; overflow: hidden; text-overflow: ellipsis; }
+.dl-row { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; margin-top: 16px; }
+.progress { color: var(--muted); font-size: 14px; }
+.explain { font-size: 13px; color: var(--muted); margin-top: 12px; }
+.explain code { font-family: "JetBrains Mono", monospace; font-size: 12px; word-break: break-all; }
+.explain .seg { padding: 1px 3px; border-radius: 4px; }
+.seg.p { background: var(--accent-soft); color: var(--accent-2); }
+.seg.w { background: var(--ok-soft); color: var(--ok); }
+.seg.t { background: var(--warn-soft); color: var(--warn); }
+footer { margin-top: 28px; color: var(--muted); font-size: 13px; }
+
+@media (max-width: 600px) {
+  header h1 { font-size: 21px; }
+  .card { padding: 16px 14px; }
+  .plate-box { flex-basis: 100%; }
+  .slide { min-width: 440px; padding: 12px 10px; }
+  .colfoot, .row { gap: 5px; }
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>MALDI-TAG <span style="font-weight:500;color:var(--muted)">· nombrar y ordenar espectros VITEK MS</span></h1>
+    <p>El VITEK MS PRIME descarga los espectros con un código del equipo, sin el nombre que le diste a cada pocillo.
+      Escribí los nombres en la placa, subí los archivos y descargalos renombrados y separados en IVD, RUO y RAW.
+      Todo pasa en tu navegador: los archivos no se suben a ningún servidor.</p>
+  </header>
+
+  <div class="steps">
+    <!-- PASO 1 -->
+    <section class="card">
+      <h2><span class="num">1</span>Escribí el nombre de cada pocillo</h2>
+      <p class="hint">Copiá los nombres de la grilla de papel. <span class="mono">Enter</span> pasa al pocillo siguiente.
+        Abajo, el número de placa tal como figura en la placa (por ejemplo <span class="mono">DS-24-19-52619</span>).
+        Los pocillos vacíos se ignoran.</p>
+      <div id="plates" class="plates"></div>
+      <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap">
+        <button id="addPlate">+ Agregar otra placa</button>
+      </div>
+      <div class="legend" id="legend" hidden>
+        <span><i style="border-color:var(--ok);background:var(--ok)"></i>Nombre y sus 3 archivos</span>
+        <span><i style="border-color:var(--warn);background:var(--warn)"></i>Falta algún archivo</span>
+        <span><i style="border-color:var(--bad);background:var(--bad)"></i>Tiene espectros pero no tiene nombre</span>
+        <span><i style="border-color:var(--muted);border-style:dashed"></i>Tiene nombre pero no hay espectros</span>
+      </div>
+    </section>
+
+    <!-- PASO 2 -->
+    <section class="card">
+      <h2><span class="num">2</span>Subí los espectros</h2>
+      <p class="hint">Los archivos <span class="mono">.mzML</span> tal cual los descarga el equipo, sin renombrar.
+        Podés soltar la carpeta completa.</p>
+      <div class="drop" id="drop">
+        <strong>Soltá acá la carpeta o los archivos</strong>
+        o elegilos desde tu computadora
+        <div class="btns">
+          <button id="pickFolder">Elegir carpeta</button>
+          <button id="pickFiles">Elegir archivos</button>
+        </div>
+        <input type="file" id="inFolder" webkitdirectory directory multiple hidden>
+        <input type="file" id="inFiles" accept=".mzml,.mzML,.MZML" multiple hidden>
+      </div>
+      <div id="loadSummary"></div>
+      <div class="explain" id="explain">
+        Cómo lee la página cada nombre de archivo:
+        <code><span>ES00292_</span><span class="seg p">DS244672472</span>_<span class="seg w">L4</span>_COL_VMSPRIME_<span class="seg t">AVG_av-IVD</span>_1.0.8_1_GOOD_…mzml</code><br>
+        <span class="seg p">número de placa</span> · <span class="seg w">pocillo</span> ·
+        <span class="seg t">tipo</span> (<span class="mono">AVG_av-IVD</span> = espectro crudo RAW,
+        <span class="mono">IVD_pl-IVD</span> = lista de picos IVD, <span class="mono">IVD_pl-RUO</span> = lista de picos RUO).
+        Los calibradores (pocillos <span class="mono">x1–x3</span>) se ignoran.
+      </div>
+    </section>
+
+    <!-- PASO 3 -->
+    <section class="card">
+      <h2><span class="num">3</span>Descargá los espectros renombrados</h2>
+      <p class="hint">Se descarga un ZIP con tres carpetas: <span class="mono">IVD</span>, <span class="mono">RUO</span> y
+        <span class="mono">RAW</span>. Cada archivo se llama como su pocillo, por ejemplo <span class="mono">AXM1.mzML</span>.</p>
+      <label class="opt">
+        <input type="checkbox" id="optWrite" checked>
+        <span>Guardar también el nombre del pocillo dentro de cada archivo <span class="tag">no modifica el espectro</span>
+          <small>Se escribe en el campo de muestra del mzML (<span class="mono">&lt;sample name="…"&gt;</span>) de los tres tipos de archivo,
+            así el nombre viaja con el archivo aunque después lo renombres. Los datos del espectro (m/z e intensidades)
+            quedan idénticos. El identificador original de la muestra se conserva en el mismo archivo.</small></span>
+      </label>
+      <label class="opt">
+        <input type="checkbox" id="optCsv">
+        <span>Incluir un registro en CSV
+          <small>Una tabla con el nombre original de cada archivo y su nombre nuevo.</small></span>
+      </label>
+      <div id="preview"></div>
+      <div class="dl-row">
+        <button class="primary" id="download" disabled>Descargar ZIP</button>
+        <span class="progress" id="progress">Subí los espectros para ver qué se va a descargar.</span>
+      </div>
+    </section>
+  </div>
+  <footer>Funciona con exportaciones de VITEK MS PRIME (placas de 48 pocillos, A–L × 1–4). Los nombres que escribas se
+    guardan en este navegador hasta que los borres.</footer>
+</div>
+
+<script>
+"use strict";
+(() => {
+  const ROWS = "ABCDEFGHIJKL".split("");
+  const COLS = [1, 2, 3, 4];
+  const QUADS = [ROWS.slice(0, 4), ROWS.slice(4, 8), ROWS.slice(8, 12)];
+  const TYPES = { IVD: "IVD", RUO: "RUO", RAW: "RAW" };
+  const STORE_KEY = "vitek-placa-v1";
+
+  let plates = [];          // [{id, barcode, names:{A1:"..."}}]
+  let files = [];           // parsed uploads
+  let uid = 0;
+
+  // ---------- utilidades ----------
+  const norm = s => String(s || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  const cleanName = s => String(s || "").trim().replace(/[\\/:*?"<>|\u0000-\u001f]+/g, "-").replace(/\s+/g, " ");
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const xmlAttr = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+  function save() {
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(plates.map(p => ({ barcode: p.barcode, names: p.names })))); } catch (e) {}
+  }
+  function load() {
+    try {
+      const raw = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
+      if (Array.isArray(raw) && raw.length) return raw.map(p => ({ id: ++uid, barcode: p.barcode || "", names: p.names || {} }));
+    } catch (e) {}
+    return null;
+  }
+
+  // ---------- lectura del nombre de archivo ----------
+  function parseName(name) {
+    const base = name.replace(/^.*[\\/]/, "");
+    if (!/\.mzml$/i.test(base)) return { name: base, kind: "other" };
+    const tok = base.replace(/\.mzml$/i, "").split("_");
+    const bi = tok.findIndex(t => /^DS\d{6,}$/i.test(t));
+    if (bi < 0 || bi + 1 >= tok.length) return { name: base, kind: "unknown" };
+    const barcode = tok[bi].toUpperCase();
+    const pos = tok[bi + 1].toUpperCase();
+    if (/^X\d+$/.test(pos)) return { name: base, kind: "calibrator", barcode };
+    if (!/^[A-L][1-4]$/.test(pos)) return { name: base, kind: "unknown", barcode };
+    let type = null;
+    if (/AVG_av-IVD/i.test(base)) type = TYPES.RAW;
+    else if (/_pl-RUO/i.test(base)) type = TYPES.RUO;
+    else if (/_pl-IVD/i.test(base)) type = TYPES.IVD;
+    if (!type) return { name: base, kind: "unknown", barcode };
+    const q = tok.find(t => /^(GOOD|BAD|POOR|FAIL\w*|REJECT\w*)$/i.test(t));
+    return { name: base, kind: "spectrum", barcode, well: pos, type, quality: q ? q.toUpperCase() : "" };
+  }
+
+  // ---------- placa ----------
+  // Código 2D decorativo (estilo DataMatrix: borde en L sólido + borde de reloj).
+  function matrixSvg(seed) {
+    const n = 14;
+    let x = (seed * 9301 + 49297) % 233280 || 7;
+    const rnd = () => (x = (x * 9301 + 49297) % 233280) / 233280;
+    let rects = "";
+    for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) {
+      let on;
+      if (c === 0 || r === n - 1) on = true;
+      else if (r === 0) on = c % 2 === 0;
+      else if (c === n - 1) on = r % 2 === 1;
+      else on = rnd() < 0.48;
+      if (on) rects += `<rect x="${c}" y="${r}" width="1" height="1"/>`;
+    }
+    return `<svg viewBox="0 0 ${n} ${n}" shape-rendering="crispEdges" aria-hidden="true"><g fill="#111">${rects}</g></svg>`;
+  }
+
+  function plateEl(p, idx) {
+    const box = document.createElement("div");
+    box.className = "plate-box";
+    box.dataset.id = p.id;
+    let html = `<div class="plate-head"><strong>Placa ${idx + 1}</strong><span>
+      <button class="link" data-act="clear">Vaciar nombres</button>
+      ${plates.length > 1 ? '<button class="link" data-act="remove">Quitar placa</button>' : ""}</span></div>
+      <div class="slide-scroll"><div class="slide">
+      <span class="corner l" aria-hidden="true">◆</span><span class="corner r" aria-hidden="true">◆</span>`;
+    for (const q of QUADS) {
+      html += `<div class="quad">`;
+      for (const r of q) {
+        html += `<div class="row"><span class="rowlab">${r}</span>`;
+        for (const c of COLS) {
+          const w = r + c;
+          html += `<div class="well" data-well="${w}"><span class="dot">${w}</span>
+            <input type="text" spellcheck="false" autocomplete="off" data-well="${w}"
+              aria-label="Nombre del pocillo ${w}" placeholder="—" value="${esc(p.names[w] || "")}"></div>`;
+        }
+        html += `</div>`;
+      }
+      html += `</div>`;
+    }
+    html += `<div class="colfoot"><span></span>${COLS.map(c => `<span>${c}</span>`).join("")}</div>
+      <div class="slide-label">${matrixSvg(p.id)}
+      <label for="bc-${p.id}">Número de placa</label>
+      <input id="bc-${p.id}" class="bc" spellcheck="false" autocomplete="off" placeholder="DS-20-17-01-251" value="${esc(p.barcode)}"></div>
+      </div></div><div class="plate-check"></div>`;
+    box.innerHTML = html;
+
+    box.addEventListener("input", e => {
+      const t = e.target;
+      if (t.classList.contains("bc")) p.barcode = t.value;
+      else if (t.dataset.well) {
+        const v = t.value;
+        if (v.trim()) p.names[t.dataset.well] = v; else delete p.names[t.dataset.well];
+      }
+      save(); refresh();
+    });
+    box.addEventListener("keydown", e => {
+      const t = e.target;
+      if (!t.dataset || !t.dataset.well || !["Enter", "ArrowDown", "ArrowUp"].includes(e.key)) return;
+      e.preventDefault();
+      const inputs = [...box.querySelectorAll("input[data-well]")];
+      const i = inputs.indexOf(t);
+      let j = i;
+      if (e.key === "Enter") j = e.shiftKey ? i - 1 : i + 1;
+      if (e.key === "ArrowDown") j = i + 4;
+      if (e.key === "ArrowUp") j = i - 4;
+      if (j >= inputs.length) { box.querySelector(".bc").focus(); return; }
+      if (j >= 0) { inputs[j].focus(); inputs[j].select(); }
+    });
+    box.addEventListener("click", e => {
+      const act = e.target.dataset && e.target.dataset.act;
+      if (act === "remove") { plates = plates.filter(x => x.id !== p.id); save(); renderPlates(); }
+      if (act === "clear" && confirm("¿Vaciar todos los nombres de esta placa?")) { p.names = {}; save(); renderPlates(); }
+    });
+    return box;
+  }
+
+  function renderPlates() {
+    const host = document.getElementById("plates");
+    host.innerHTML = "";
+    plates.forEach((p, i) => host.appendChild(plateEl(p, i)));
+    refresh();
+  }
+
+  function addPlate(barcode) {
+    plates.push({ id: ++uid, barcode: barcode || "", names: {} });
+    save(); renderPlates();
+  }
+
+  // ---------- emparejar placa + archivos ----------
+  function build() {
+    const spectra = files.filter(f => f.kind === "spectrum");
+    const byBarcode = new Map();
+    for (const f of spectra) {
+      if (!byBarcode.has(f.barcode)) byBarcode.set(f.barcode, []);
+      byBarcode.get(f.barcode).push(f);
+    }
+    const plateBarcodes = new Set();
+    const items = [];            // archivos que se exportan
+    const wellInfo = new Map();  // plateId -> {well -> {types:Set, bad:bool, count}}
+    const seenNames = new Map(); // nombre final (por carpeta) -> conteo
+
+    for (const p of plates) {
+      const key = norm(p.barcode);
+      const info = {};
+      wellInfo.set(p.id, info);
+      if (!key) continue;
+      plateBarcodes.add(key);
+      for (const f of byBarcode.get(key) || []) {
+        const wi = info[f.well] || (info[f.well] = { types: new Set(), bad: false, count: 0 });
+        wi.types.add(f.type); wi.count++;
+        if (f.quality && f.quality !== "GOOD") wi.bad = true;
+      }
+    }
+
+    // nombres duplicados entre pocillos
+    const nameCount = new Map();
+    for (const p of plates) for (const [w, n] of Object.entries(p.names)) {
+      const c = cleanName(n); if (!c) continue;
+      nameCount.set(c.toLowerCase(), (nameCount.get(c.toLowerCase()) || 0) + 1);
+    }
+
+    const multi = plates.filter(p => norm(p.barcode)).length > 1;
+    for (const p of plates) {
+      const key = norm(p.barcode);
+      if (!key) continue;
+      const list = (byBarcode.get(key) || []).slice().sort((a, b) => a.name.localeCompare(b.name));
+      for (const f of list) {
+        const nm = cleanName(p.names[f.well]);
+        if (!nm) continue;
+        const folder = (multi ? `${p.barcode.trim() || key}/` : "") + f.type;
+        let out = nm;
+        const k = (folder + "/" + nm).toLowerCase();
+        const n = (seenNames.get(k) || 0) + 1;
+        seenNames.set(k, n);
+        if (n > 1) out = `${nm}_${n}`;
+        items.push({ file: f, plate: p, folder, outName: out + ".mzML", wellName: nm });
+      }
+    }
+    const orphanBarcodes = [...byBarcode.keys()].filter(b => !plateBarcodes.has(b));
+    return { spectra, byBarcode, items, wellInfo, nameCount, orphanBarcodes };
+  }
+
+  function refresh() {
+    const r = build();
+    const hasFiles = files.length > 0;
+    document.getElementById("legend").hidden = !hasFiles;
+
+    // estado de cada pocillo
+    for (const p of plates) {
+      const box = document.querySelector(`.plate-box[data-id="${p.id}"]`);
+      if (!box) continue;
+      const info = r.wellInfo.get(p.id) || {};
+      for (const el of box.querySelectorAll(".well")) {
+        const w = el.dataset.well;
+        const nm = cleanName(p.names[w]);
+        const wi = info[w];
+        el.className = "well";
+        let tip = "";
+        if (hasFiles && norm(p.barcode)) {
+          if (wi && nm) {
+            if (wi.types.size === 3) { el.classList.add("st-ok"); tip = "IVD, RUO y RAW"; }
+            else {
+              el.classList.add("st-partial");
+              tip = "Falta: " + ["IVD", "RUO", "RAW"].filter(t => !wi.types.has(t)).join(", ");
+            }
+          } else if (wi && !nm) { el.classList.add("st-noname"); tip = "Tiene espectros pero no tiene nombre: no se descarga"; }
+          else if (nm) { el.classList.add("st-nofiles"); tip = "No hay espectros de este pocillo"; }
+          if (wi && wi.bad) { el.classList.add("has-bad"); tip += " · el equipo marcó calidad no GOOD"; }
+        }
+        if (nm && (r.nameCount.get(nm.toLowerCase()) || 0) > 1) {
+          el.classList.add("st-dup"); tip += (tip ? " · " : "") + "Nombre repetido en otro pocillo";
+        }
+        el.title = tip;
+      }
+      // confirmación de placa
+      const chk = box.querySelector(".plate-check");
+      const key = norm(p.barcode);
+      if (!hasFiles) chk.innerHTML = "";
+      else if (!key) chk.innerHTML = `<span class="warn-t">Escribí el número de placa para emparejarla con los espectros.</span>`;
+      else {
+        const list = r.byBarcode.get(key) || [];
+        if (!list.length) chk.innerHTML = `<span class="bad-t">Ningún espectro subido es de la placa ${esc(p.barcode)}. Revisá el número.</span>`;
+        else {
+          const wells = new Set(list.map(f => f.well));
+          const unnamed = [...wells].filter(w => !cleanName(p.names[w]));
+          chk.innerHTML = `<span class="ok-t">✓ Placa confirmada: ${list.length} archivos de ${wells.size} pocillos.</span>` +
+            (unnamed.length ? ` <span class="bad-t">${unnamed.length} pocillo(s) con espectros sin nombre: ${unnamed.join(", ")}.</span>` : "");
+        }
+      }
+    }
+
+    // resumen de carga
+    const sum = document.getElementById("loadSummary");
+    if (!hasFiles) sum.innerHTML = "";
+    else {
+      const calib = files.filter(f => f.kind === "calibrator").length;
+      const unknown = files.filter(f => f.kind === "unknown");
+      const other = files.filter(f => f.kind === "other").length;
+      const cnt = t => r.spectra.filter(f => f.type === t).length;
+      let html = `<div class="stats">
+        <div class="stat"><b>${cnt("IVD")}</b><small>Listas de picos IVD</small></div>
+        <div class="stat"><b>${cnt("RUO")}</b><small>Listas de picos RUO</small></div>
+        <div class="stat"><b>${cnt("RAW")}</b><small>Espectros crudos (AVG)</small></div>
+        <div class="stat"><b>${r.byBarcode.size}</b><small>Placa(s) en los archivos</small></div>
+      </div><ul class="notes">`;
+      if (r.orphanBarcodes.length) {
+        html += `<li class="w" style="display:block"><span>Hay archivos de ${r.orphanBarcodes.length === 1 ? "una placa" : r.orphanBarcodes.length + " placas"}
+          que no ${r.orphanBarcodes.length === 1 ? "está" : "están"} en el paso 1. Tocá una para agregarla:</span>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">` +
+          r.orphanBarcodes.map(b => `<button class="mono" data-addbc="${esc(b)}">+ ${esc(b)} <span style="color:var(--muted);font-weight:400">(${r.byBarcode.get(b).length})</span></button>`).join("") +
+          `</div></li>`;
+      }
+      if (calib) html += `<li><span>${calib} archivo(s) de calibrador ignorados.</span></li>`;
+      if (unknown.length) html += `<li class="w"><span>${unknown.length} archivo(s) .mzML sin el formato del equipo (¿ya renombrados?): no se usan.</span>
+        <button class="link" data-show="unk">Ver</button></li><li id="unkList" hidden class="mono" style="font-size:12px;display:block">${unknown.map(f => esc(f.name)).join("<br>")}</li>`;
+      if (other) html += `<li><span>${other} archivo(s) que no son .mzML ignorados.</span></li>`;
+      html += `</ul>`;
+      sum.innerHTML = html;
+    }
+
+    // vista previa y botón
+    const prev = document.getElementById("preview");
+    const btn = document.getElementById("download");
+    const prog = document.getElementById("progress");
+    if (!r.items.length) {
+      prev.innerHTML = "";
+      btn.disabled = true;
+      prog.textContent = hasFiles ? "Todavía no hay espectros con nombre para descargar." : "Subí los espectros para ver qué se va a descargar.";
+    } else {
+      const renamedDup = r.items.filter(i => i.outName !== i.wellName + ".mzML").length;
+      prev.innerHTML = `<div class="preview"><table><thead><tr><th>Carpeta</th><th>Nombre nuevo</th><th>Pocillo</th><th>Archivo original</th></tr></thead><tbody>` +
+        r.items.map(i => `<tr><td>${esc(i.folder)}</td><td class="mono"><b>${esc(i.outName)}</b></td><td class="mono">${i.file.well}</td><td class="orig mono" title="${esc(i.file.name)}">${esc(i.file.name)}</td></tr>`).join("") +
+        `</tbody></table></div>` +
+        (renamedDup ? `<p class="explain warn-t">${renamedDup} archivo(s) tienen el mismo nombre que otro en su carpeta y se descargan con un sufijo (_2, _3…).</p>` : "");
+      btn.disabled = false;
+      prog.textContent = `${r.items.length} archivos listos.`;
+    }
+  }
+
+  // ---------- carga de archivos ----------
+  async function walkEntry(entry, out) {
+    if (entry.isFile) {
+      await new Promise(res => entry.file(f => { out.push(f); res(); }, res));
+    } else if (entry.isDirectory) {
+      const reader = entry.createReader();
+      let batch;
+      do {
+        batch = await new Promise(res => reader.readEntries(res, () => res([])));
+        for (const e of batch) await walkEntry(e, out);
+      } while (batch.length);
+    }
+  }
+
+  function addFiles(list) {
+    const known = new Set(files.map(f => f.name + "|" + f.size));
+    for (const f of list) {
+      if (f.name.startsWith(".")) continue;
+      const k = f.name + "|" + f.size;
+      if (known.has(k)) continue;
+      known.add(k);
+      files.push(Object.assign(parseName(f.name), { blob: f, size: f.size }));
+    }
+    refresh();
+  }
+
+  const drop = document.getElementById("drop");
+  drop.addEventListener("dragover", e => { e.preventDefault(); drop.classList.add("over"); });
+  drop.addEventListener("dragleave", () => drop.classList.remove("over"));
+  drop.addEventListener("drop", async e => {
+    e.preventDefault(); drop.classList.remove("over");
+    const out = [];
+    const items = [...(e.dataTransfer.items || [])];
+    const entries = items.map(i => i.webkitGetAsEntry && i.webkitGetAsEntry()).filter(Boolean);
+    if (entries.length) { for (const en of entries) await walkEntry(en, out); }
+    else out.push(...e.dataTransfer.files);
+    addFiles(out);
+  });
+  document.getElementById("pickFolder").onclick = () => document.getElementById("inFolder").click();
+  document.getElementById("pickFiles").onclick = () => document.getElementById("inFiles").click();
+  for (const id of ["inFolder", "inFiles"]) {
+    document.getElementById(id).addEventListener("change", e => { addFiles([...e.target.files]); e.target.value = ""; });
+  }
+  document.getElementById("loadSummary").addEventListener("click", e => {
+    const bc = e.target.dataset.addbc;
+    if (bc) {
+      const empty = plates.find(p => !norm(p.barcode) && !Object.keys(p.names).length);
+      if (empty) { empty.barcode = bc; save(); renderPlates(); } else addPlate(bc);
+    }
+    if (e.target.dataset.show === "unk") { const l = document.getElementById("unkList"); l.hidden = !l.hidden; }
+  });
+
+  // ---------- descarga ----------
+  function setSampleName(xml, name) {
+    return xml.replace(/<sample(\s[^>]*?)?\sname="[^"]*"/, (m) => m.replace(/\sname="[^"]*"$/, ` name="${xmlAttr(name)}"`));
+  }
+
+  document.getElementById("download").addEventListener("click", async () => {
+    const r = build();
+    if (!r.items.length) return;
+    const btn = document.getElementById("download");
+    const prog = document.getElementById("progress");
+    const write = document.getElementById("optWrite").checked;
+    btn.disabled = true;
+    try {
+      const zip = new JSZip();
+      let i = 0;
+      for (const it of r.items) {
+        i++;
+        if (i % 10 === 0) { prog.textContent = `Preparando ${i} de ${r.items.length}…`; await new Promise(res => setTimeout(res)); }
+        const path = `${it.folder}/${it.outName}`;
+        if (write) zip.file(path, setSampleName(await it.file.blob.text(), it.wellName));
+        else zip.file(path, it.file.blob);
+      }
+      if (document.getElementById("optCsv").checked) {
+        const q = s => `"${String(s).replace(/"/g, '""')}"`;
+        const rows = [["placa", "pocillo", "tipo", "nombre_nuevo", "archivo_original"].join(",")]
+          .concat(r.items.map(it => [it.file.barcode, it.file.well, it.file.type, `${it.folder}/${it.outName}`, it.file.name].map(q).join(",")));
+        zip.file("registro_renombrado.csv", "﻿" + rows.join("\r\n"));
+      }
+      const blob = await zip.generateAsync({ type: "blob", compression: "DEFLATE", compressionOptions: { level: 1 } },
+        m => { prog.textContent = `Comprimiendo… ${Math.round(m.percent)} %`; });
+      const d = new Date();
+      const stamp = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `VITEK_espectros_${stamp}.zip`;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 30000);
+      prog.textContent = `Listo: ${r.items.length} archivos descargados.`;
+    } catch (err) {
+      prog.textContent = "No se pudo armar el ZIP: " + err.message;
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  document.getElementById("addPlate").onclick = () => addPlate("");
+
+  // API mínima para pruebas automáticas
+  window.__vitek = { parseName, addFiles, build, get plates() { return plates; }, setSampleName };
+
+  plates = load() || [{ id: ++uid, barcode: "", names: {} }];
+  renderPlates();
+})();
+</script>
+</body>
+</html>
