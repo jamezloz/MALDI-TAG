@@ -68,6 +68,37 @@ body {
 }
 .wrap { max-width: 1120px; margin: 0 auto; padding: 28px 16px 64px; }
 header { text-align: center; padding: 22px 0 6px; }
+/* cabecera en tres columnas: EMIRA a la izquierda, título al centro, la derecha equilibra */
+.top { display: grid; grid-template-columns: 190px 1fr 190px; align-items: start; gap: 16px; }
+.emira { display: flex; flex-direction: column; align-items: center; text-align: left; }
+.emira img { width: 150px; height: auto; display: block; }
+.team { position: relative; margin-top: 6px; font-size: 12.5px; }
+.team summary {
+  list-style: none; cursor: pointer; user-select: none; text-align: center;
+  padding: 5px 18px; border: 1px solid var(--line); border-radius: 999px; background: var(--card);
+  color: var(--muted); font-weight: 600;
+}
+.team summary::-webkit-details-marker { display: none; }
+.team summary::after { content: " ▾"; }
+.team[open] summary::after { content: " ▴"; }
+.team summary:hover { color: var(--ink); border-color: var(--accent-2); }
+.team .box {
+  position: absolute; z-index: 20; top: calc(100% + 8px); left: 50%; transform: translateX(-50%); width: 270px;
+  padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: var(--card);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, .08);
+}
+.team .t { font-weight: 700; color: var(--ink); margin-bottom: 2px; }
+.team .lema { color: var(--muted); font-size: 11.5px; line-height: 1.4; margin-bottom: 8px; }
+.team ul { margin: 0 0 10px; padding-left: 16px; color: var(--ink); line-height: 1.55; }
+.team .k { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: .05em; margin-bottom: 2px; }
+.team a { color: var(--accent-2); font-weight: 600; text-decoration: none; word-break: break-all; }
+.team a:hover { text-decoration: underline; }
+@media (max-width: 900px) {
+  .top { grid-template-columns: 1fr; }
+  .top > .spacer { display: none; }
+  .emira { order: 2; max-width: 320px; margin: 4px auto 0; }
+  .emira img { width: 120px; }
+}
 header h1 { font-size: 60px; line-height: 1.05; margin: 0; letter-spacing: -0.02em; font-weight: 700; }
 /* «TAG» dentro de una etiqueta (con su agujero), con una roja y una verde detrás */
 .tagstack { position: relative; display: inline-flex; margin-left: 10px; vertical-align: baseline; top: 4px; }
@@ -272,11 +303,38 @@ footer { margin-top: 28px; color: var(--muted); font-size: 13px; }
 </head>
 <body>
 <div class="wrap">
-  <header>
+  <header class="top">
+    <aside class="emira">
+      <picture>
+        <source srcset="assets/emira/emira-animado-oscuro.svg" media="(prefers-color-scheme: dark)">
+        <img src="assets/emira/emira-animado-claro.svg" alt="EMIRA – Equipo MALDI-TOF para la Identificación de Resistencia Antimicrobiana">
+      </picture>
+      <details class="team">
+        <summary>Equipo</summary>
+        <div class="box">
+          <div class="t">EMIRA</div>
+          <div class="lema">Equipo MALDI-TOF para la Identificación de Resistencia Antimicrobiana</div>
+          <div class="k">Integrantes</div>
+          <ul>
+            <li>Jerson Andrés Martínez</li>
+            <li>Roque Figueroa-Espinosa</li>
+            <li>Ezequiel Nuske</li>
+            <li>Lautaro Barraza</li>
+            <li>Lucía Rago</li>
+            <li>José Alejandro Di Conza</li>
+          </ul>
+          <div class="k">Contacto</div>
+          <a href="mailto:equipomladiffyb@gmail.com">equipomladiffyb@gmail.com</a>
+        </div>
+      </details>
+    </aside>
+    <div class="title">
     <h1>MALDI<span class="tagstack"><span class="tagback red" aria-hidden="true"></span><span class="tagback green" aria-hidden="true"></span><span class="tagbox">TAG</span></span></h1>
     <p class="sub">Nombrar y ordenar espectros VITEK MS</p>
     <p>El VITEK MS PRIME descarga los espectros con un código, sin el nombre del pocillo. Escribí los nombres en la placa,
       subí los archivos y descargalos renombrados en IVD, RUO y RAW. Los archivos no salen de tu computadora.</p>
+    </div>
+    <div class="spacer"></div>
   </header>
 
   <div class="steps">
@@ -343,6 +401,12 @@ footer { margin-top: 28px; color: var(--muted); font-size: 13px; }
 
 <script>
 "use strict";
+// El desplegable del equipo se cierra al hacer clic fuera de él o con Escape.
+(() => {
+  const team = document.querySelector(".team");
+  document.addEventListener("click", e => { if (team.open && !team.contains(e.target)) team.open = false; });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") team.open = false; });
+})();
 (() => {
   const ROWS = "ABCDEFGHIJKL".split("");
   const COLS = [1, 2, 3, 4];
