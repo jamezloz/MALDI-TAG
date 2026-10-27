@@ -67,7 +67,7 @@ body {
   font: 15px/1.5 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 .wrap { max-width: 1120px; margin: 0 auto; padding: 28px 16px 64px; }
-header { text-align: center; padding: 34px 0 6px; }
+header { text-align: center; padding: 22px 0 6px; }
 header h1 { font-size: 60px; line-height: 1.05; margin: 0; letter-spacing: -0.02em; font-weight: 700; }
 /* «TAG» dentro de una etiqueta (con su agujero), con una roja y una verde detrás */
 .tagstack { position: relative; display: inline-flex; margin-left: 10px; vertical-align: baseline; }
@@ -83,13 +83,13 @@ header h1 { font-size: 60px; line-height: 1.05; margin: 0; letter-spacing: -0.02
   transform: rotate(-8deg);
 }
 .tagback { position: absolute; inset: 0; z-index: 1; }
-.tagback.green { background: #2f9e6a; transform: rotate(-16deg); }
-.tagback.red { background: #d64545; transform: rotate(-24deg); z-index: 0; }
+.tagback.green { background: #2f9e6a; transform: rotate(0deg); }
+.tagback.red { background: #d64545; transform: rotate(8deg); z-index: 0; }
 .tagbox::before, .tagback::before {
   content: ""; position: absolute; left: 18px; top: 50%;
   width: 13px; height: 13px; margin-top: -6.5px; border-radius: 50%; background: var(--bg);
 }
-header .sub { margin: 10px auto 4px; max-width: none; font-size: 18px; font-weight: 600; color: var(--ink); }
+header .sub { margin: 28px auto 4px; max-width: none; font-size: 18px; font-weight: 600; color: var(--ink); }
 header p { margin: 0 auto; color: var(--muted); max-width: 620px; font-size: 13.5px; }
 .steps { display: grid; gap: 22px; margin-top: 26px; }
 .steps > * { min-width: 0; }
