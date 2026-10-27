@@ -70,7 +70,7 @@ body {
 header { text-align: center; padding: 22px 0 6px; }
 header h1 { font-size: 60px; line-height: 1.05; margin: 0; letter-spacing: -0.02em; font-weight: 700; }
 /* «TAG» dentro de una etiqueta (con su agujero), con una roja y una verde detrás */
-.tagstack { position: relative; display: inline-flex; margin-left: 10px; vertical-align: baseline; }
+.tagstack { position: relative; display: inline-flex; margin-left: 10px; vertical-align: baseline; top: 4px; }
 .tagbox, .tagback {
   border-radius: 6px 12px 12px 6px;
   clip-path: polygon(22px 0, 100% 0, 100% 100%, 22px 100%, 0 50%);
@@ -80,10 +80,10 @@ header h1 { font-size: 60px; line-height: 1.05; margin: 0; letter-spacing: -0.02
   position: relative; z-index: 2; display: inline-flex; align-items: center;
   padding: 2px 22px 5px 40px;
   background: var(--accent); color: #fff;
-  transform: rotate(-8deg);
+  transform: rotate(-4deg);
 }
 .tagback { position: absolute; inset: 0; z-index: 1; }
-.tagback.green { background: #2f9e6a; transform: rotate(0deg); }
+.tagback.green { background: #2f9e6a; transform: rotate(2deg); }
 .tagback.red { background: #d64545; transform: rotate(8deg); z-index: 0; }
 .tagbox::before, .tagback::before {
   content: ""; position: absolute; left: 18px; top: 50%;
