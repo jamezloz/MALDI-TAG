@@ -59,6 +59,7 @@
   --warn: #e0a547; --warn-soft: #3a2c12; --bad: #ef6f5e; --bad-soft: #3d1a16; --input: #0f1822;
 }
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html, body { margin: 0; }
 body {
   background: var(--bg);
@@ -66,8 +67,21 @@ body {
   font: 15px/1.5 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 .wrap { max-width: 1120px; margin: 0 auto; padding: 28px 16px 64px; }
-header h1 { font-size: 26px; margin: 0 0 6px; letter-spacing: -0.01em; }
-header p { margin: 0; color: var(--muted); max-width: 760px; }
+header { text-align: center; padding: 10px 0 6px; }
+header h1 { font-size: 46px; line-height: 1.05; margin: 0; letter-spacing: -0.02em; font-weight: 700; }
+/* «TAG» dentro de una etiqueta (con su agujero) */
+.tagbox {
+  position: relative; display: inline-flex; align-items: center;
+  margin-left: 8px; padding: 2px 18px 4px 32px;
+  background: var(--accent); color: #fff; border-radius: 6px 12px 12px 6px;
+  clip-path: polygon(17px 0, 100% 0, 100% 100%, 17px 100%, 0 50%);
+}
+.tagbox::before {
+  content: ""; position: absolute; left: 14px; top: 50%;
+  width: 10px; height: 10px; margin-top: -5px; border-radius: 50%; background: var(--bg);
+}
+header .sub { margin: 10px auto 4px; max-width: none; font-size: 18px; font-weight: 600; color: var(--ink); }
+header p { margin: 0 auto; color: var(--muted); max-width: 620px; font-size: 13.5px; }
 .steps { display: grid; gap: 22px; margin-top: 26px; }
 .steps > * { min-width: 0; }
 .card {
@@ -97,8 +111,8 @@ button:disabled { opacity: .45; cursor: not-allowed; filter: none; }
 button.link { border: 0; background: none; color: var(--accent-2); padding: 4px 6px; }
 
 /* ---------- placa ---------- */
-.plates { display: flex; flex-wrap: wrap; gap: 22px; align-items: flex-start; }
-.plate-box { flex: 1 1 520px; max-width: 600px; min-width: 0; }
+.plates { display: flex; flex-wrap: wrap; gap: 26px; align-items: flex-start; justify-content: center; }
+.plate-box { flex: 1 1 560px; max-width: 760px; min-width: 0; }
 .plate-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; gap: 8px; }
 .plate-head strong { font-size: 14px; }
 .slide-scroll { overflow-x: auto; padding: 6px 6px 8px; }
@@ -116,17 +130,17 @@ button.link { border: 0; background: none; color: var(--accent-2); padding: 4px 
   border: 1px solid #a3a9af;
   border-radius: 7px;
   box-shadow: 0 0 0 5px #17191c, 0 6px 18px rgba(0,0,0,.25);
-  padding: 26px 18px 14px;
+  padding: 30px 24px 18px;
   min-width: 500px;
   color: var(--s-text);
 }
 .corner { position: absolute; top: 9px; font-size: 11px; color: var(--s-ink); opacity: .7; line-height: 1; }
 .corner.l { left: 12px; } .corner.r { right: 12px; }
-.colfoot, .row { display: grid; grid-template-columns: 22px repeat(4, minmax(0, 1fr)); gap: 8px; align-items: center; }
-.colfoot { margin-top: 8px; font-size: 13px; color: var(--s-ink); text-align: center; }
-.quad { display: grid; gap: 8px; }
-.quad + .quad { margin-top: 18px; }
-.rowlab { font-size: 14px; color: var(--s-ink); text-align: center; }
+.colhead, .row { display: grid; grid-template-columns: 26px repeat(4, minmax(0, 1fr)); gap: 10px; align-items: center; }
+.colhead { margin-bottom: 10px; font-size: 15px; color: var(--s-ink); text-align: center; }
+.quad { display: grid; gap: 10px; }
+.quad + .quad { margin-top: 22px; }
+.rowlab { font-size: 16px; color: var(--s-ink); text-align: center; }
 .well {
   display: flex; align-items: center; gap: 6px;
   background: var(--s-pill);
@@ -138,17 +152,17 @@ button.link { border: 0; background: none; color: var(--accent-2); padding: 4px 
 }
 .well:hover { border-color: rgba(0,0,0,.12); }
 .dot {
-  flex: none; width: 28px; height: 28px; border-radius: 50%;
+  flex: none; width: 32px; height: 32px; border-radius: 50%;
   display: grid; place-items: center;
-  font-size: 9.5px; font-weight: 700; color: rgba(255,255,255,.92);
+  font-size: 10.5px; font-weight: 700; color: rgba(255,255,255,.92);
   background: radial-gradient(circle at 35% 30%, #c3c7cc, var(--s-well) 60%, #959a9f);
   box-shadow: inset 0 1px 2px rgba(0,0,0,.25);
 }
 .well input {
   flex: 1; min-width: 0; width: 100%;
   border: 0; outline: 0; background: transparent; color: var(--s-text);
-  font: 600 13px/1.2 "JetBrains Mono", ui-monospace, monospace;
-  padding: 4px 4px;
+  font: 600 14px/1.2 "JetBrains Mono", ui-monospace, monospace;
+  padding: 5px 4px;
 }
 .well input::placeholder { color: var(--s-ink); opacity: .5; font-weight: 400; }
 .well:focus-within { background: #fff; border-color: #4a90c4; box-shadow: 0 0 0 3px rgba(74,144,196,.25); }
@@ -205,6 +219,12 @@ button.link { border: 0; background: none; color: var(--accent-2); padding: 4px 
 .opt { display: flex; gap: 10px; align-items: flex-start; padding: 10px 0; }
 .opt input { margin-top: 4px; width: 16px; height: 16px; accent-color: var(--accent); flex: none; }
 .opt small { display: block; color: var(--muted); font-size: 13px; }
+.notice {
+  display: flex; align-items: flex-start; gap: 10px; margin: 4px 0 6px;
+  padding: 10px 12px; border-radius: 10px; font-size: 14px;
+  background: var(--warn-soft); border: 1px solid var(--warn); color: var(--ink);
+}
+.notice svg { width: 20px; height: 20px; flex: none; color: var(--warn); margin-top: 1px; }
 .tag {
   display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .02em;
   padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-2);
@@ -226,30 +246,31 @@ button.link { border: 0; background: none; color: var(--accent-2); padding: 4px 
 footer { margin-top: 28px; color: var(--muted); font-size: 13px; }
 
 @media (max-width: 600px) {
-  header h1 { font-size: 21px; }
+  header h1 { font-size: 34px; }
+  .tagbox { padding: 2px 14px 3px 26px; }
+  .tagbox::before { left: 11px; width: 8px; height: 8px; margin-top: -4px; }
   .card { padding: 16px 14px; }
   .plate-box { flex-basis: 100%; }
   .slide { min-width: 440px; padding: 12px 10px; }
-  .colfoot, .row { gap: 5px; }
+  .colhead, .row { gap: 5px; }
 }
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <h1>MALDI-TAG <span style="font-weight:500;color:var(--muted)">· nombrar y ordenar espectros VITEK MS</span></h1>
-    <p>El VITEK MS PRIME descarga los espectros con un código del equipo, sin el nombre que le diste a cada pocillo.
-      Escribí los nombres en la placa, subí los archivos y descargalos renombrados y separados en IVD, RUO y RAW.
-      Todo pasa en tu navegador: los archivos no se suben a ningún servidor.</p>
+    <h1>MALDI<span class="tagbox">TAG</span></h1>
+    <p class="sub">Nombrar y ordenar espectros VITEK MS</p>
+    <p>El VITEK MS PRIME descarga los espectros con un código, sin el nombre del pocillo. Escribí los nombres en la placa,
+      subí los archivos y descargalos renombrados en IVD, RUO y RAW. Los archivos no salen de tu computadora.</p>
   </header>
 
   <div class="steps">
     <!-- PASO 1 -->
     <section class="card">
       <h2><span class="num">1</span>Escribí el nombre de cada pocillo</h2>
-      <p class="hint">Copiá los nombres de la grilla de papel. <span class="mono">Enter</span> pasa al pocillo siguiente.
-        Abajo, el número de placa tal como figura en la placa (por ejemplo <span class="mono">DS-24-19-52619</span>).
-        Los pocillos vacíos se ignoran.</p>
+      <p class="hint">Escribí los nombres en la grilla. <span class="mono">Enter</span> pasa al pocillo siguiente.
+        Abajo, el número de placa (por ejemplo <span class="mono">DS-24-19-52619</span>). Los pocillos vacíos se ignoran.</p>
       <div id="plates" class="plates"></div>
       <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap">
         <button id="addPlate">+ Agregar otra placa</button>
@@ -278,28 +299,17 @@ footer { margin-top: 28px; color: var(--muted); font-size: 13px; }
         <input type="file" id="inFiles" accept=".mzml,.mzML,.MZML" multiple hidden>
       </div>
       <div id="loadSummary"></div>
-      <div class="explain" id="explain">
-        Cómo lee la página cada nombre de archivo:
-        <code><span>ES00292_</span><span class="seg p">DS244672472</span>_<span class="seg w">L4</span>_COL_VMSPRIME_<span class="seg t">AVG_av-IVD</span>_1.0.8_1_GOOD_…mzml</code><br>
-        <span class="seg p">número de placa</span> · <span class="seg w">pocillo</span> ·
-        <span class="seg t">tipo</span> (<span class="mono">AVG_av-IVD</span> = espectro crudo RAW,
-        <span class="mono">IVD_pl-IVD</span> = lista de picos IVD, <span class="mono">IVD_pl-RUO</span> = lista de picos RUO).
-        Los calibradores (pocillos <span class="mono">x1–x3</span>) se ignoran.
-      </div>
     </section>
 
     <!-- PASO 3 -->
     <section class="card">
       <h2><span class="num">3</span>Descargá los espectros renombrados</h2>
       <p class="hint">Se descarga un ZIP con tres carpetas: <span class="mono">IVD</span>, <span class="mono">RUO</span> y
-        <span class="mono">RAW</span>. Cada archivo se llama como su pocillo, por ejemplo <span class="mono">AXM1.mzML</span>.</p>
-      <label class="opt">
-        <input type="checkbox" id="optWrite" checked>
-        <span>Guardar también el nombre del pocillo dentro de cada archivo <span class="tag">no modifica el espectro</span>
-          <small>Se escribe en el campo de muestra del mzML (<span class="mono">&lt;sample name="…"&gt;</span>) de los tres tipos de archivo,
-            así el nombre viaja con el archivo aunque después lo renombres. Los datos del espectro (m/z e intensidades)
-            quedan idénticos. El identificador original de la muestra se conserva en el mismo archivo.</small></span>
-      </label>
+        <span class="mono">RAW</span>. Cada archivo se llama como su pocillo.</p>
+      <div class="notice" role="note">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2.5 20h19L12 3Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 10v4.5M12 17.2v.3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
+        <span>El nombre del pocillo también se guarda dentro de cada archivo (campo de muestra del mzML). El espectro no se modifica.</span>
+      </div>
       <label class="opt">
         <input type="checkbox" id="optCsv">
         <span>Incluir un registro en CSV
@@ -308,12 +318,10 @@ footer { margin-top: 28px; color: var(--muted); font-size: 13px; }
       <div id="preview"></div>
       <div class="dl-row">
         <button class="primary" id="download" disabled>Descargar ZIP</button>
-        <span class="progress" id="progress">Subí los espectros para ver qué se va a descargar.</span>
+        <span class="progress" id="progress"></span>
       </div>
     </section>
   </div>
-  <footer>Funciona con exportaciones de VITEK MS PRIME (placas de 48 pocillos, A–L × 1–4). Los nombres que escribas se
-    guardan en este navegador hasta que los borres.</footer>
 </div>
 
 <script>
@@ -392,7 +400,8 @@ footer { margin-top: 28px; color: var(--muted); font-size: 13px; }
       <button class="link" data-act="clear">Vaciar nombres</button>
       ${plates.length > 1 ? '<button class="link" data-act="remove">Quitar placa</button>' : ""}</span></div>
       <div class="slide-scroll"><div class="slide">
-      <span class="corner l" aria-hidden="true">◆</span><span class="corner r" aria-hidden="true">◆</span>`;
+      <span class="corner l" aria-hidden="true">◆</span><span class="corner r" aria-hidden="true">◆</span>
+      <div class="colhead"><span></span>${COLS.map(c => `<span>${c}</span>`).join("")}</div>`;
     for (const q of QUADS) {
       html += `<div class="quad">`;
       for (const r of q) {
@@ -407,8 +416,7 @@ footer { margin-top: 28px; color: var(--muted); font-size: 13px; }
       }
       html += `</div>`;
     }
-    html += `<div class="colfoot"><span></span>${COLS.map(c => `<span>${c}</span>`).join("")}</div>
-      <div class="slide-label">${matrixSvg(p.id)}
+    html += `<div class="slide-label">${matrixSvg(p.id)}
       <label for="bc-${p.id}">Número de placa</label>
       <input id="bc-${p.id}" class="bc" spellcheck="false" autocomplete="off" placeholder="DS-20-17-01-251" value="${esc(p.barcode)}"></div>
       </div></div><div class="plate-check"></div>`;
@@ -595,7 +603,7 @@ footer { margin-top: 28px; color: var(--muted); font-size: 13px; }
     if (!r.items.length) {
       prev.innerHTML = "";
       btn.disabled = true;
-      prog.textContent = hasFiles ? "Todavía no hay espectros con nombre para descargar." : "Subí los espectros para ver qué se va a descargar.";
+      prog.textContent = hasFiles ? "Todavía no hay espectros con nombre para descargar." : "";
     } else {
       const renamedDup = r.items.filter(i => i.outName !== i.wellName + ".mzML").length;
       prev.innerHTML = `<div class="preview"><table><thead><tr><th>Carpeta</th><th>Nombre nuevo</th><th>Pocillo</th><th>Archivo original</th></tr></thead><tbody>` +
@@ -669,7 +677,7 @@ footer { margin-top: 28px; color: var(--muted); font-size: 13px; }
     if (!r.items.length) return;
     const btn = document.getElementById("download");
     const prog = document.getElementById("progress");
-    const write = document.getElementById("optWrite").checked;
+    const write = true;
     btn.disabled = true;
     try {
       const zip = new JSZip();
