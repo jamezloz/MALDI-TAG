@@ -31,7 +31,7 @@ Un navegador actual (Chrome, Edge, Firefox o Safari). No hay que instalar nada.
 
 ## Cómo citar
 
-Martínez-Lozano, J. A. (2026). *MALDI-TAG: nombrar y ordenar espectros VITEK MS*. https://github.com/jamezloz/MALDI-TAG
+Martínez, J. A., Figueroa-Espinosa, R., Nuske, E., Barraza, L., Rago, L. y Di Conza, J. A. (2026). *MALDI-TAG: nombrar y ordenar espectros VITEK MS* (v1.0.0). EMIRA. https://github.com/jamezloz/MALDI-TAG
 
 ## Licencia
 

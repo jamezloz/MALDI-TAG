@@ -1,0 +1,19 @@
+{
+  "title": "MALDI-TAG: nombrar y ordenar espectros VITEK MS",
+  "upload_type": "software",
+  "language": "spa",
+  "description": "Página web que renombra los espectros que descarga el VITEK MS PRIME (que vienen identificados con un código, sin el nombre del pocillo) usando los nombres que el usuario escribe en la placa. Devuelve un ZIP con las carpetas IVD, RUO y RAW, guarda el nombre del pocillo dentro de cada mzML y no modifica el espectro. Todo se procesa en el navegador: los archivos no salen de la computadora del usuario. Disponible en https://jamezloz.github.io/MALDI-TAG/. Desarrollado por EMIRA (Equipo EM MALDI-TOF para la Identificación de Resistencia Antimicrobiana).",
+  "creators": [
+    {"name": "Martínez, Jerson Andrés"},
+    {"name": "Figueroa-Espinosa, Roque"},
+    {"name": "Nuske, Ezequiel"},
+    {"name": "Barraza, Lautaro"},
+    {"name": "Rago, Lucía"},
+    {"name": "Di Conza, José Alejandro"}
+  ],
+  "license": "MIT",
+  "keywords": ["MALDI-TOF", "VITEK MS", "mzML", "mass spectrometry", "microbiology"],
+  "related_identifiers": [
+    {"identifier": "https://jamezloz.github.io/MALDI-TAG/", "relation": "isSupplementTo", "scheme": "url"}
+  ]
+}
