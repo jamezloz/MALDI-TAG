@@ -67,7 +67,7 @@ body {
   font: 15px/1.5 Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 .wrap { max-width: 1120px; margin: 0 auto; padding: 28px 16px 64px; }
-header { text-align: center; padding: 10px 0 6px; }
+header { text-align: center; padding: 22px 0 6px; }
 header h1 { font-size: 60px; line-height: 1.05; margin: 0; letter-spacing: -0.02em; font-weight: 700; }
 /* «TAG» dentro de una etiqueta (con su agujero) */
 .tagbox {
@@ -75,6 +75,7 @@ header h1 { font-size: 60px; line-height: 1.05; margin: 0; letter-spacing: -0.02
   margin-left: 10px; padding: 2px 22px 5px 40px;
   background: var(--accent); color: #fff; border-radius: 6px 12px 12px 6px;
   clip-path: polygon(22px 0, 100% 0, 100% 100%, 22px 100%, 0 50%);
+  transform: rotate(-8deg); transform-origin: 0 50%;
 }
 .tagbox::before {
   content: ""; position: absolute; left: 18px; top: 50%;
