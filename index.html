@@ -362,16 +362,16 @@ footer { margin-top: 28px; color: var(--muted); font-size: 13px; }
     <section class="card">
       <h2><span class="num">2</span>Subí los espectros</h2>
       <p class="hint">Los archivos <span class="mono">.mzML</span> tal cual los descarga el equipo, sin renombrar.
-        Podés soltar la carpeta completa.</p>
+        Podés soltar la carpeta completa o el <span class="mono">.zip</span> descargado, sin descomprimirlo.</p>
       <div class="drop" id="drop">
-        <strong>Soltá acá la carpeta o los archivos</strong>
+        <strong>Soltá acá la carpeta, el ZIP o los archivos</strong>
         o elegilos desde tu computadora
         <div class="btns">
           <button id="pickFolder">Elegir carpeta</button>
-          <button id="pickFiles">Elegir archivos</button>
+          <button id="pickFiles">Elegir archivos o ZIP</button>
         </div>
         <input type="file" id="inFolder" webkitdirectory directory multiple hidden>
-        <input type="file" id="inFiles" accept=".mzml,.mzML,.MZML" multiple hidden>
+        <input type="file" id="inFiles" accept=".mzml,.mzML,.MZML,.zip,.ZIP" multiple hidden>
       </div>
       <div id="loadSummary"></div>
     </section>
@@ -709,7 +709,31 @@ footer { margin-top: 28px; color: var(--muted); font-size: 13px; }
     }
   }
 
-  function addFiles(list) {
+  // Los .zip se abren acá mismo (también un zip dentro de otro); se ignoran las copias ocultas de macOS
+  // (__MACOSX/, archivos que empiezan con «._»).
+  async function expandZips(list) {
+    const out = [];
+    for (const f of list) {
+      if (!/\.zip$/i.test(f.name)) { out.push(f); continue; }
+      try {
+        const zip = await JSZip.loadAsync(f);
+        const inner = [];
+        for (const entry of Object.values(zip.files)) {
+          const base = entry.name.split("/").pop();
+          if (entry.dir || !base || base.startsWith(".") || entry.name.split("/").includes("__MACOSX")) continue;
+          if (!/\.(mzml|zip)$/i.test(base)) continue;
+          inner.push(new File([await entry.async("blob")], base));
+        }
+        out.push(...await expandZips(inner));
+      } catch (err) {
+        alert(`No se pudo abrir ${f.name}: no parece un ZIP válido.`);
+      }
+    }
+    return out;
+  }
+
+  async function addFiles(list) {
+    list = await expandZips(list);
     const known = new Set(files.map(f => f.name + "|" + f.size));
     for (const f of list) {
       if (f.name.startsWith(".")) continue;
