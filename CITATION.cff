@@ -5,6 +5,14 @@ type: software
 version: 1.0.0
 date-released: 2026-10-29
 license: MIT
+doi: 10.5281/zenodo.23770115
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.23770115
+    description: Todas las versiones
+  - type: doi
+    value: 10.5281/zenodo.23770116
+    description: Versión 1.0.0
 url: "https://jamezloz.github.io/MALDI-TAG/"
 repository-code: "https://github.com/jamezloz/MALDI-TAG"
 authors:
