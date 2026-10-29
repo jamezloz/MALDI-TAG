@@ -33,7 +33,7 @@ Un navegador actual (Chrome, Edge, Firefox o Safari). No hay que instalar nada.
 
 ## Cómo citar
 
-Martínez, J. A., Figueroa-Espinosa, R., Nuske, E., Barraza, L., Rago, L. y Di Conza, J. A. (2026). *MALDI-TAG: nombrar y ordenar espectros VITEK MS* EMIRA. https://doi.org/10.5281/zenodo.23770115
+Martínez, J. A., Figueroa-Espinosa, R., Nuske, E., Barraza, L., Rago, L. y Di Conza, J. A. (2026). *MALDI-TAG: nombrar y ordenar espectros VITEK MS* [Software]. EMIRA. https://doi.org/10.5281/zenodo.23770115
 
 Ese DOI apunta siempre a la última versión. Para citar una versión puntual, la 1.0.0 es https://doi.org/10.5281/zenodo.23770116.
 
